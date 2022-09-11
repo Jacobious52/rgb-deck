@@ -67,16 +67,15 @@ async fn main(_spawner: Spawner) {
             rand(&mut small_rng, 255).try_into().unwrap(),
         );
 
-        let mut buttons_buffer: [u8; 2] = read_button(&mut i2c, &[0]).await;
-        buttons_buffer[0] = !buttons_buffer[0];
-        buttons_buffer[1] = !buttons_buffer[1];
+        let buttons_buffer: [u8; 2] = read_button(&mut i2c, &[0]).await;
 
-        // let current = !((buttons_buffer[0] as u16) | ((buttons_buffer[1] as u16) << 8));
-        // let changed = current ^ prev;
-        // let pressed = current & changed;
-        // prev = current;
+        // bit masking yay. turn 2 u8s into 1 u16
+        let current = !((buttons_buffer[0] as u16) | ((buttons_buffer[1] as u16) << 8));
+        let changed = current ^ prev;
+        let _pressed = current & changed;
+        prev = current;
 
-        let bits = buttons_buffer.view_bits::<Lsb0>();
+        let bits = current.view_bits::<Lsb0>();
         for (i, bit) in bits.iter().enumerate() {
             if *bit {
                 rgb.set_color(i, 200, 0, 0);

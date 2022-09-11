@@ -20,22 +20,7 @@ pub struct Rgb {
 }
 
 impl Rgb {
-    pub fn new(p: Peripherals) -> Self {
-        let miso = p.PIN_16;
-        let mosi = p.PIN_19;
-        let clk = p.PIN_18;
-
-        let spi = Spi::new(
-            p.SPI0,
-            clk,
-            mosi,
-            miso,
-            p.DMA_CH0,
-            p.DMA_CH1,
-            Config::default(),
-        );
-
-        let cs = Output::new(p.PIN_17, Level::High);
+    pub fn new(spi: Spi<'static, SPI0, Async>, cs: Output<'static, PIN_17>) -> Self {
         let buf = [0_u8; BUF_LEN];
 
         Self { spi, cs, buf }

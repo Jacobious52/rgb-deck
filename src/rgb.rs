@@ -1,8 +1,7 @@
 use embassy_rp::{
-    gpio::{Level, Output},
+    gpio::Output,
     peripherals::{PIN_17, SPI0},
-    spi::{Async, Config, Spi},
-    Peripherals,
+    spi::{Async, Spi},
 };
 
 const RGB_WIDTH: usize = 4;

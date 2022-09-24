@@ -1,18 +1,44 @@
-// // use embedded_hal_async::i2c::*;
+use embassy_rp::{i2c::{I2c, Async, Instance}, peripherals::I2C0};
+use bitvec::prelude::*;
 
-// use embassy_embedded_hal::shared_bus::asynch::i2c::I2cDeviceWithConfig;
-// use embassy_sync::{mutex::Mutex, blocking_mutex::raw::ThreadModeRawMutex};
-// use static_cell::StaticCell;
+pub struct Keypad {
+    i2c: I2c<'static, I2C0, Async>,
+    prev: u16,
+    current: u16,
+}
 
-// fn hello() {
+impl Keypad {
+    pub fn new(i2c: I2c<'static, I2C0, Async>) -> Self {
+      Self {
+        i2c,
+        current: 0,
+        prev: 0,
+      }
+    }
 
-//     static I2C_BUS: StaticCell<Mutex::<ThreadModeRawMutex, Twim<TWISPI0>>> = StaticCell::new();
-// //! let config = twim::Config::default();
-// //! let irq = interrupt::take!(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0);
-// //! let i2c = Twim::new(p.TWISPI0, irq, p.P0_03, p.P0_04, config);
-// //! let i2c_bus = Mutex::<ThreadModeRawMutex, _>::new(i2c);
-// //! let i2c_bus = I2C_BUS.init(i2c_bus);
-// //! 
+    pub async fn update(&mut self) {
+        let buttons_buffer: [u8; 2] = Keypad::read_buttons(&mut self.i2c, &[0]).await;
 
-//     I2cDeviceWithConfig::new(bus, config)
-// }
+        // bit masking yay. turn 2 u8s into 1 u16
+        self.current = !((buttons_buffer[0] as u16) | ((buttons_buffer[1] as u16) << 8));
+        let changed = self.current ^ self.prev;
+        let _pressed = self.current & changed;
+        self.prev = self.current;
+    }
+
+    pub fn pressed(&self) -> &BitSlice<u16, Lsb0> {
+        self.current.view_bits::<Lsb0>()
+    }
+
+    async fn read_buttons<T: Instance, const N: usize, const M: usize>(
+        i2c: &mut embassy_rp::i2c::I2c<'_, T, Async>,
+        offset: &[u8; N],
+    ) -> [u8; M] {
+        let button_address = 0x20;
+    
+        let mut button_buffer = [0u8; M];
+        i2c.write_read(button_address, offset, &mut button_buffer).await.unwrap();
+    
+        button_buffer
+    }
+}

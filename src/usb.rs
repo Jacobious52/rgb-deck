@@ -3,11 +3,14 @@ use embassy_rp::{
     peripherals::USB,
     usb::{Driver, Instance},
 };
+use embassy_sync::{channel::Channel, blocking_mutex::raw::ThreadModeRawMutex};
 use embassy_usb::{driver::EndpointError, Builder, Config};
 use embassy_usb_serial::{CdcAcmClass, State};
 
+use crate::UsbChan;
+
 #[embassy_executor::task]
-pub async fn run(driver: Driver<'static, USB>) {
+pub async fn run(driver: Driver<'static, USB>, usb_send_chan: UsbChan, usb_recv_chan: UsbChan) {
     // Create embassy-usb Config
     let mut config = Config::new(0xc0de, 0xcafe);
     config.manufacturer = Some("Embassy");
@@ -55,7 +58,7 @@ pub async fn run(driver: Driver<'static, USB>) {
     let echo_fut = async {
         loop {
             class.wait_connection().await;
-            let _ = echo(&mut class).await;
+            let _ = echo(&mut class, &usb_send_chan, &usb_recv_chan).await;
         }
     };
 
@@ -75,12 +78,17 @@ impl From<EndpointError> for Disconnected {
 
 async fn echo<'d, T: Instance + 'd>(
     class: &mut CdcAcmClass<'d, Driver<'d, T>>,
+    usb_send_chan: UsbChan,
+    usb_recv_chan: UsbChan,
 ) -> Result<(), Disconnected> {
-    let mut buf = [0; 64];
+    let mut in_buf = [0; 64];
     loop {
-        let n = class.read_packet(&mut buf).await?;
-        let data = &buf[..n];
+        let in_n = class.read_packet(&mut in_buf).await?;
+        let _ = usb_recv_chan.try_send((in_n, in_buf));
 
-        class.write_packet(data).await?;
+        if let Ok((out_n, out_buf)) = usb_send_chan.try_recv() {
+            let data = &out_buf[..out_n];
+            class.write_packet(data).await?;
+        }
     }
 }

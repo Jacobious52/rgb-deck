@@ -8,6 +8,8 @@ use embassy_rp::gpio::Output;
 use embassy_rp::interrupt;
 use embassy_rp::spi::Spi;
 use embassy_rp::usb::Driver;
+use embassy_sync::blocking_mutex::raw::ThreadModeRawMutex;
+use embassy_sync::channel::Channel;
 use embassy_time::{Duration, Timer};
 
 use rand::rngs::SmallRng;
@@ -18,6 +20,9 @@ use rgb_deck::Rgb;
 use rgb_deck::usb;
 
 use {defmt_rtt as _, panic_probe as _};
+
+static USB_SEND_CHAN: Channel<ThreadModeRawMutex, (usize, [u8; 64]), 1> = Channel::new();
+static USB_RECV_CHAN: Channel<ThreadModeRawMutex, (usize, [u8; 64]), 1> = Channel::new();
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
@@ -52,13 +57,23 @@ async fn main(spawner: Spawner) {
     let irq = interrupt::take!(USBCTRL_IRQ);
     let driver = Driver::new(p.USB, irq);
 
-    spawner.spawn(usb::run(driver)).unwrap();
+    spawner.spawn(usb::run(driver, &USB_SEND_CHAN, &USB_RECV_CHAN)).unwrap();
 
     loop {
         Timer::after(Duration::from_millis(20)).await;
 
         rgb.update().await;
         keypad.update().await;
+
+        if let Ok((_n, _buf)) = USB_RECV_CHAN.try_recv() {
+
+        }
+
+        let pressed_bytes = keypad.pressed_u16().to_le_bytes();
+        let mut out_buf = [0; 64];
+        out_buf[0] = pressed_bytes[0];
+        out_buf[1] = pressed_bytes[1]; 
+        let _ = USB_SEND_CHAN.try_send((2, out_buf));
         
         for (i, pressed) in keypad.pressed().iter().enumerate() {
             if *pressed {

@@ -30,6 +30,10 @@ impl Keypad {
         self.current.view_bits::<Lsb0>()
     }
 
+    pub fn pressed_u16(&self) -> u16 {
+        self.current
+    }
+
     async fn read_buttons<T: Instance, const N: usize, const M: usize>(
         i2c: &mut embassy_rp::i2c::I2c<'_, T, Async>,
         offset: &[u8; N],

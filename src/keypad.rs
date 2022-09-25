@@ -1,5 +1,10 @@
-use embassy_rp::{i2c::{I2c, Async, Instance}, peripherals::I2C0};
 use bitvec::prelude::*;
+use embassy_rp::{
+    i2c::{Async, I2c, Instance},
+    peripherals::I2C0,
+};
+use embassy_sync::{blocking_mutex::raw::ThreadModeRawMutex, mutex::Mutex};
+use embassy_time::{Duration, Timer};
 
 pub struct Keypad {
     i2c: I2c<'static, I2C0, Async>,
@@ -9,11 +14,11 @@ pub struct Keypad {
 
 impl Keypad {
     pub fn new(i2c: I2c<'static, I2C0, Async>) -> Self {
-      Self {
-        i2c,
-        current: 0,
-        prev: 0,
-      }
+        Self {
+            i2c,
+            current: 0,
+            prev: 0,
+        }
     }
 
     pub async fn update(&mut self) {
@@ -26,8 +31,12 @@ impl Keypad {
         self.prev = self.current;
     }
 
-    pub fn pressed(&self) -> &BitSlice<u16, Lsb0> {
+    pub fn is_down(&self) -> &BitSlice<u16, Lsb0> {
         self.current.view_bits::<Lsb0>()
+    }
+
+    pub fn is_down_u16(&self) -> u16 {
+        self.current
     }
 
     async fn read_buttons<T: Instance, const N: usize, const M: usize>(
@@ -35,10 +44,21 @@ impl Keypad {
         offset: &[u8; N],
     ) -> [u8; M] {
         let button_address = 0x20;
-    
+
         let mut button_buffer = [0u8; M];
-        i2c.write_read(button_address, offset, &mut button_buffer).await.unwrap();
-    
+        i2c.write_read(button_address, offset, &mut button_buffer)
+            .await
+            .unwrap();
+
         button_buffer
+    }
+}
+
+#[embassy_executor::task]
+pub async fn run(keypad: &'static Mutex<ThreadModeRawMutex, Keypad>) {
+    loop {
+        Timer::after(Duration::from_millis(20)).await;
+
+        keypad.lock().await.update().await;
     }
 }

@@ -3,6 +3,8 @@ use embassy_rp::{
     peripherals::{PIN_17, SPI0},
     spi::{Async, Spi},
 };
+use embassy_sync::{blocking_mutex::raw::ThreadModeRawMutex, mutex::Mutex};
+use embassy_time::{Duration, Timer};
 
 const RGB_WIDTH: usize = 4;
 const RGB_HIGHT: usize = 4;
@@ -51,5 +53,14 @@ impl Rgb {
         self.cs.set_low();
         self.spi.write(&self.buf).await.unwrap();
         self.cs.set_high();
+    }
+}
+
+#[embassy_executor::task]
+pub async fn run(rgb: &'static Mutex<ThreadModeRawMutex, Rgb>) {
+    loop {
+        Timer::after(Duration::from_millis(20)).await;
+
+        rgb.lock().await.update().await;
     }
 }

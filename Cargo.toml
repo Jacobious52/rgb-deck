@@ -10,6 +10,7 @@ embassy-rp = { path = "../embassy/embassy-rp", features = ["defmt", "unstable-tr
 embassy-executor = { path = "../embassy/embassy-executor", features = ["defmt", "integrated-timers"] }
 embassy-time = { path = "../embassy/embassy-time", features = ["defmt", "defmt-timestamp-uptime"] }
 embassy-futures = { path = "../embassy/embassy-futures" }
+embassy-sync = { path = "../embassy/embassy-sync" }
 embassy-usb = { path = "../embassy/embassy-usb", features = ["defmt"] }
 embassy-usb-serial = { path = "../embassy/embassy-usb-serial", features = ["defmt"] }
 

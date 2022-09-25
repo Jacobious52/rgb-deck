@@ -26,7 +26,7 @@ version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d299f547288d6db8d5c3a2916f7b2f66134b15b8c1ac1c4357dd3b8752af7bb2"
 dependencies = [
- "critical-section 1.1.0",
+ "critical-section 1.1.1",
 ]
 
 [[package]]
@@ -118,7 +118,7 @@ checksum = "70858629a458fdfd39f9675c4dc309411f2a3f83bede76988d81bf1a0ecee9e0"
 dependencies = [
  "bare-metal 0.2.5",
  "bitfield",
- "critical-section 1.1.0",
+ "critical-section 1.1.1",
  "embedded-hal 0.2.7",
  "volatile-register",
 ]
@@ -157,9 +157,9 @@ dependencies = [
 
 [[package]]
 name = "critical-section"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d02ba51481d019be9c74a831d1133c364d78831b75c833478f3a21e1fd91e01a"
+checksum = "6548a0ad5d2549e111e1f6a11a6c2e2d00ce6a3dafe22948d67c2b443f775e52"
 
 [[package]]
 name = "darling"
@@ -259,10 +259,10 @@ dependencies = [
  "atomic-polyfill 1.0.1",
  "cfg-if",
  "cortex-m",
- "critical-section 1.1.0",
+ "critical-section 1.1.1",
  "embassy-executor",
  "embassy-hal-common",
- "embassy-macros 0.1.0",
+ "embassy-macros",
  "embassy-sync",
 ]
 
@@ -285,10 +285,10 @@ version = "0.1.0"
 dependencies = [
  "atomic-polyfill 1.0.1",
  "cfg-if",
- "critical-section 1.1.0",
+ "critical-section 1.1.1",
  "defmt",
- "embassy-macros 0.1.0",
- "embassy-time 0.1.0",
+ "embassy-macros",
+ "embassy-time",
  "futures-util",
  "static_cell",
 ]
@@ -315,17 +315,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "embassy-macros"
-version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#573c433f64a049d4e0d501df1194c3228aae0863"
-dependencies = [
- "darling",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "embassy-rp"
 version = "0.1.0"
 dependencies = [
@@ -333,14 +322,14 @@ dependencies = [
  "cfg-if",
  "cortex-m",
  "cortex-m-rt",
- "critical-section 1.1.0",
+ "critical-section 1.1.1",
  "defmt",
  "embassy-cortex-m",
  "embassy-embedded-hal",
  "embassy-executor",
  "embassy-hal-common",
  "embassy-sync",
- "embassy-time 0.1.0",
+ "embassy-time",
  "embassy-usb",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0-alpha.8",
@@ -356,7 +345,7 @@ version = "0.1.0"
 dependencies = [
  "atomic-polyfill 1.0.1",
  "cfg-if",
- "critical-section 1.1.0",
+ "critical-section 1.1.1",
  "embedded-io",
  "futures-util",
  "heapless",
@@ -368,22 +357,9 @@ version = "0.1.0"
 dependencies = [
  "atomic-polyfill 1.0.1",
  "cfg-if",
- "critical-section 1.1.0",
- "embassy-macros 0.1.0",
- "embedded-hal 0.2.7",
- "futures-util",
-]
-
-[[package]]
-name = "embassy-time"
-version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#573c433f64a049d4e0d501df1194c3228aae0863"
-dependencies = [
- "atomic-polyfill 1.0.1",
- "cfg-if",
- "critical-section 1.1.0",
+ "critical-section 1.1.1",
  "defmt",
- "embassy-macros 0.1.0 (git+https://github.com/embassy-rs/embassy)",
+ "embassy-macros",
  "embedded-hal 0.2.7",
  "futures-util",
 ]
@@ -395,6 +371,15 @@ dependencies = [
  "defmt",
  "embassy-futures",
  "heapless",
+]
+
+[[package]]
+name = "embassy-usb-serial"
+version = "0.1.0"
+dependencies = [
+ "defmt",
+ "embassy-sync",
+ "embassy-usb",
 ]
 
 [[package]]
@@ -602,9 +587,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "lock_api"
-version = "0.4.8"
+version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f80bf5aacaf25cbfc8210d1cfb718f2bf3b11c4c54e5afe36c236853a8ec390"
+checksum = "435011366fe56583b16cf956f9df0095b405b82d76425bc8981c0e22e60ec4df"
 dependencies = [
  "autocfg",
  "scopeguard",
@@ -694,9 +679,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.43"
+version = "1.0.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a2ca2c61bc9f3d74d2886294ab7b9853abd9c1ad903a3ac7815c58989bb7bab"
+checksum = "7bd7356a8122b6c4a24a82b278680c73357984ca2fc79a0f9fa6dea7dced7c58"
 dependencies = [
  "unicode-ident",
 ]
@@ -727,9 +712,9 @@ dependencies = [
 
 [[package]]
 name = "rand_core"
-version = "0.6.3"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d34f1408f55294453790c48b2f1ebbb1c5b4b7563eb1f418bcfcfdbb06ebb4e7"
+checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 
 [[package]]
 name = "regex"
@@ -761,8 +746,11 @@ dependencies = [
  "display-interface",
  "display-interface-spi",
  "embassy-executor",
+ "embassy-futures",
  "embassy-rp",
- "embassy-time 0.1.0 (git+https://github.com/embassy-rs/embassy)",
+ "embassy-time",
+ "embassy-usb",
+ "embassy-usb-serial",
  "embedded-graphics",
  "embedded-hal 1.0.0-alpha.8",
  "embedded-hal-async",
@@ -819,7 +807,7 @@ version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bfa0f585226d2e68097d4f95d113b15b83a82e819ab25717ec0590d9584ef366"
 dependencies = [
- "semver 1.0.13",
+ "semver 1.0.14",
 ]
 
 [[package]]
@@ -839,9 +827,9 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.13"
+version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93f6841e709003d68bb2deee8c343572bf446003ec20a583e76f7b15cebf3711"
+checksum = "e25dfac463d778e353db5be2449d1cce89bd6fd23c9f1ea21310ce6e5a1b29c4"
 
 [[package]]
 name = "semver-parser"
@@ -894,9 +882,9 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
-version = "1.0.99"
+version = "1.0.100"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58dbef6ec655055e20b86b15a8cc6d439cca19b667537ac6a1369572d151ab13"
+checksum = "52205623b1b0f064a4e71182c3b18ae902267282930c6d5462c91b859668426e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -911,9 +899,9 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.3"
+version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4f5b37a154999a8f3f98cc23a628d850e154479cd94decf3414696e12e31aaf"
+checksum = "dcc811dc4066ac62f84f11307873c4850cb653bfa9b1719cee2bd2204a4bc5dd"
 
 [[package]]
 name = "vcell"

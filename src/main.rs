@@ -5,19 +5,24 @@
 use embassy_executor::Spawner;
 use embassy_rp::gpio::Level;
 use embassy_rp::gpio::Output;
+use embassy_rp::interrupt;
 use embassy_rp::spi::Spi;
+use embassy_rp::usb::Driver;
 use embassy_time::{Duration, Timer};
 
 use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
 use rgb_deck::Keypad;
-use rgb_deck::{Rgb, NUM_LEDS};
+use rgb_deck::Rgb;
+use rgb_deck::usb;
 
 use {defmt_rtt as _, panic_probe as _};
 
 #[embassy_executor::main]
-async fn main(_spawner: Spawner) {
+async fn main(spawner: Spawner) {
+    let mut _small_rng = SmallRng::seed_from_u64(42);
+
     let p = embassy_rp::init(Default::default());
 
     let miso = p.PIN_16;
@@ -44,14 +49,16 @@ async fn main(_spawner: Spawner) {
     let i2c = embassy_rp::i2c::I2c::new(p.I2C0, p.PIN_5, p.PIN_4, p.DMA_CH3, p.DMA_CH4, config);
     let mut keypad = Keypad::new(i2c);
 
-    let mut _small_rng = SmallRng::seed_from_u64(42);
+    let irq = interrupt::take!(USBCTRL_IRQ);
+    let driver = Driver::new(p.USB, irq);
+
+    spawner.spawn(usb::run(driver)).unwrap();
 
     loop {
         Timer::after(Duration::from_millis(20)).await;
 
         rgb.update().await;
         keypad.update().await;
-    
         
         for (i, pressed) in keypad.pressed().iter().enumerate() {
             if *pressed {

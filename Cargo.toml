@@ -6,8 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-embassy-rp = { git = "https://github.com/embassy-rs/embassy", features = ["defmt", "unstable-traits", "nightly", "unstable-pac"]  }
-embassy-executor = { git = "https://github.com/embassy-rs/embassy", features = ["defmt", "integrated-timers"] }
+embassy-rp = { path = "../embassy/embassy-rp", revision = "embassy-rp/i2c", features = ["defmt", "unstable-traits", "nightly", "unstable-pac"]  }
+# embassy-rp = { git = "https://github.com/embassy-rs/embassy", features = ["defmt", "unstable-traits", "nightly", "unstable-pac"]  }
+embassy-executor = { path = "../embassy/embassy-executor", revision = "embassy-rp/i2c", features = ["defmt", "integrated-timers"] }
+#embassy-executor = { git = "https://github.com/embassy-rs/embassy", features = ["defmt", "integrated-timers"] }
 embassy-time = { git = "https://github.com/embassy-rs/embassy", features = ["defmt", "defmt-timestamp-uptime"] }
 
 defmt = "0.3"
@@ -30,3 +32,4 @@ static_cell = "1.0.0"
 
 
 rand = { version = "0.8.5", features = ["small_rng"], default-features = false }
+bitvec = { version = "1.0.1", default-features = false }
